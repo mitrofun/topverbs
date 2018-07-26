@@ -1,4 +1,4 @@
-from dclnt import flat
+from topverbs.topverbs import flat
 
 
 def test_flat():
