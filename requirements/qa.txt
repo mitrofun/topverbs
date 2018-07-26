@@ -1,0 +1,6 @@
+-r base.txt
+pytest==3.6.3
+pytest-flake8==1.0.2
+flake8==3.5.0
+pyflakes==1.6.0
+pytest-mccabe==0.1
