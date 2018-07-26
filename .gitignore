@@ -101,3 +101,5 @@ node_modules
 .direnv
 .envrc
 /.cache/
+/TODO
+/.pytest_cache/
