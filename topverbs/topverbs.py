@@ -1,6 +1,7 @@
 import os
 import ast
 import nltk
+import json
 import argparse
 import collections
 
@@ -189,6 +190,37 @@ def print_top_words_in_console(words, top_size):
     print(f'total {len(words)} words, {len(set(words))} unique')
     for word, occurrence in collections.Counter(words).most_common(top_size):
         print(word, occurrence)
+
+
+def flat_list(_list):
+    return sum(_list, [])
+
+
+def words_to_json_dict(_list):
+    dictionary = dict((word, count) for word, count in _list)
+    return json.dumps(dictionary)
+
+
+def get_top_verbs(dirs, top_size=10, format_data='list'):
+    """
+    Get top verbs used in function names in projects.
+    To get data in json format, specify format_data in the variable
+    :param format_data: output format,possible value :'json','list'.
+    Default is 'list'
+    :param dirs: path to project or list with path to project
+    :param top_size: top size
+    :return: list of tuples or json
+    """
+    if not type(dirs) == list:
+        project_dirs = [dirs]
+    else:
+        project_dirs = dirs
+    words = get_raw_list_verbs(project_dirs)
+    data = collections.Counter(flat_list(words)).most_common(top_size)
+    if format_data == 'json':
+        data = words_to_json_dict(data)
+    print(data)
+    return data
 
 
 def main():
