@@ -4,8 +4,10 @@ from os.path import join, dirname
 
 setup(
     name='topverbs',
-    entry_points={
-        'console_scripts': ['topverbs = topverbs:main']
+    console_scripts={
+        'console_scripts': [
+            'topverbs = topverbs:main'
+        ]
     },
     version=topverbs.__version__,
     install_requires=['nltk>=3'],
