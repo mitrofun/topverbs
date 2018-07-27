@@ -134,7 +134,6 @@ def download_nltk_data():
     if os.path.exists(data_dir):
         return
     nltk.download(tagger, download_dir=download_dir)
-    nltk.data.path.append(download_dir)
 
 
 def parse_args():
@@ -174,6 +173,8 @@ def get_ungrouped_list_verbs(projects_dir):
     """
     words = []
 
+    download_dir = check_download_dir()
+    nltk.data.path.append(download_dir)
     download_nltk_data()
 
     for path in projects_dir:
