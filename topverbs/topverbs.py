@@ -138,6 +138,10 @@ def download_nltk_data():
 
 
 def parse_args():
+    """
+    Get arguments from the command line
+    :return: args from console
+    """
     parser = argparse.ArgumentParser(
         description='Top verbs used in function names in the project(s).'
     )
@@ -162,7 +166,12 @@ def parse_args():
     return parser.parse_args()
 
 
-def get_raw_list_verbs(projects_dir):
+def get_ungrouped_list_verbs(projects_dir):
+    """
+    Returns an ungrouped list of words
+    :param projects_dir:
+    :return: return list with ungrouped words(verbs)
+    """
     words = []
 
     download_nltk_data()
@@ -178,25 +187,12 @@ def get_raw_list_verbs(projects_dir):
     return words
 
 
-def print_top_words_in_console(words, top_size):
-    """
-    Prints top words in the console
-    :param words: Word list
-    :param top_size: Size top, int
-    :return: Print in console
-    """
-    print('-' * 120)
-    print(f'top {top_size} verbs')
-    print(f'total {len(words)} words, {len(set(words))} unique')
-    for word, occurrence in collections.Counter(words).most_common(top_size):
-        print(word, occurrence)
-
-
-def flat_list(_list):
-    return sum(_list, [])
-
-
 def words_to_json_dict(_list):
+    """
+    Make from list of tuples = > dict in json
+    :param _list:
+    :return: json, like {word: freq}
+    """
     dictionary = dict((word, count) for word, count in _list)
     return json.dumps(dictionary)
 
@@ -215,22 +211,8 @@ def get_top_verbs(dirs, top_size=10, format_data='list'):
         project_dirs = [dirs]
     else:
         project_dirs = dirs
-    words = get_raw_list_verbs(project_dirs)
-    data = collections.Counter(flat_list(words)).most_common(top_size)
+    words = get_ungrouped_list_verbs(project_dirs)
+    data = collections.Counter(make_list_flat(words)).most_common(top_size)
     if format_data == 'json':
         data = words_to_json_dict(data)
-    print(data)
     return data
-
-
-def main():
-    args = parse_args()
-    logger.debug(f'dirs {args.dirs}')
-    logger.debug(f'top {args.top_size}')
-
-    words = get_raw_list_verbs(args.dirs)
-    print_top_words_in_console(make_list_flat(words), args.top_size)
-
-
-if __name__ == '__main__':
-    main()

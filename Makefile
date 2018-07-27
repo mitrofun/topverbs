@@ -24,4 +24,4 @@ clean:
 
 # target: debug - Run script in debug mode
 debug:
-	DEBUG=true python topverbs/topverbs.py
+	DEBUG=true python topverbs.py -d .
