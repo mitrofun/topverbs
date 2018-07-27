@@ -1,0 +1,13 @@
+sudo: required
+
+language: python
+
+services:
+  - docker
+
+before_install:
+- docker build . -t topverbs
+
+script:
+- bundle pytest
+- bundle make qa
