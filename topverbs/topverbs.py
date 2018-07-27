@@ -12,7 +12,6 @@ TOP_SIZE = 10
 PATH = ''
 
 logging.config.fileConfig('log.conf')
-# logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(__name__)
 
 
@@ -62,10 +61,10 @@ def get_syntax_trees_from_files(file_names):
     return trees
 
 
-def get_syntax_trees(_path, with_file_names=False, with_file_content=False):
-    """Get trees in path"""
-    path = PATH
-    file_names = get_file_names_from_path(path)
+# def get_syntax_trees(_path, with_file_names=False, with_file_content=False):
+#     """Get trees in path"""
+#     path = PATH
+#     file_names = get_file_names_from_path(path)
     # for dir_name, dirs, files in os.walk(path, topdown=True):
     #     for file in files:
     #         if file.endswith('.py'):
@@ -90,9 +89,9 @@ def get_syntax_trees(_path, with_file_names=False, with_file_content=False):
     #             trees.append((filename, tree))
     #     else:
     #         trees.append(tree)
-    trees = get_syntax_trees_from_files(file_names)
-    logger.debug('trees generated')
-    return trees
+    # trees = get_syntax_trees_from_files(file_names)
+    # logger.debug('trees generated')
+    # return trees
 
 
 def get_all_names(tree):
@@ -148,30 +147,30 @@ def get_verbs(function_name_list):
     return make_list_flat(verbs)
 
 
-def get_top_verbs_in_path(path, top_size=10):
-    """
-    Получаем топ 10 глаголов в текущей дирректории
-    :param path: Путь, строка
-    :param top_size: Ограничение
-    :return:
-    """
-    global PATH
-    PATH = path
-
-    logger.debug(f'path is {path}')
-
-    trees = get_syntax_trees(None)
-    all_functions = get_all_function_names(trees)
-
-    logger.debug(f'count of all function: {len(all_functions)}')
-
-    functions = get_function_names_without_special(all_functions)
-
-    logger.debug(f'count of function: {len(functions)}')
-    logger.debug('functions extracted')
-
-    verbs = get_verbs(functions)
-    return collections.Counter(verbs).most_common(top_size)
+# def get_top_verbs_in_path(path, top_size=10):
+#     """
+#     Получаем топ 10 глаголов в текущей дирректории
+#     :param path: Путь, строка
+#     :param top_size: Ограничение
+#     :return:
+#     """
+#     global PATH
+#     PATH = path
+#
+#     logger.debug(f'path is {path}')
+#
+#     trees = get_syntax_trees(None)
+#     all_functions = get_all_function_names(trees)
+#
+#     logger.debug(f'count of all function: {len(all_functions)}')
+#
+#     functions = get_function_names_without_special(all_functions)
+#
+#     logger.debug(f'count of function: {len(functions)}')
+#     logger.debug('functions extracted')
+#
+#     verbs = get_verbs(functions)
+#     return collections.Counter(verbs).most_common(top_size)
 
 
 # def get_top_functions_names_in_path(path, top_size=10):
@@ -213,14 +212,14 @@ def download_nltk_data():
 
 def print_top_words(words, top_size):
     """
-    Печатает в консоли топ слов
-    :param words: Список слов, словарь
-    :param top_size: Размер топа
-    :return: Выводит топ слов в консоль
+    Prints top words in the console
+    :param words: Word list
+    :param top_size: Size top, int
+    :return: Print in console
     """
     print('-' * 120)
-    print('total %s words, %s unique' % (len(words), len(set(words))))
-    print(words)
+    print(f'top {top_size} words')
+    print(f'total {len(words)} words, {len(set(words))} unique')
     for word, occurrence in collections.Counter(words).most_common(top_size):
         print(word, occurrence)
 
@@ -238,9 +237,14 @@ def main():
 
     for project in projects:
         path = os.path.join('..', project)
-        words += get_top_verbs_in_path(path, top_size=TOP_SIZE)
+        file_names = get_file_names_from_path(path)
+        syntax_trees = get_syntax_trees_from_files(file_names)
+        all_functions = get_all_function_names(syntax_trees)
+        function_names = get_function_names_without_special(all_functions)
+        verbs = get_verbs(function_names)
+        words.append(verbs)
 
-    print_top_words(words, TOP_SIZE)
+    print_top_words(make_list_flat(words), TOP_SIZE)
 
 
 if __name__ == '__main__':
