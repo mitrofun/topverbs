@@ -7,11 +7,13 @@ import logging.config
 
 from nltk import pos_tag
 
+DEBUG = os.environ.get('DEBUG') == 'true'
+
 TOP_SIZE = 10
 
-PATH = ''
+if DEBUG:
+    logging.config.fileConfig('log.conf')
 
-logging.config.fileConfig('log.conf')
 logger = logging.getLogger(__name__)
 
 
@@ -54,44 +56,11 @@ def get_syntax_trees_from_files(file_names):
         try:
             tree = ast.parse(file_content)
         except SyntaxError as e:
-            logger.warning(e)
+            logger.debug(e)
             continue
         trees.append(tree)
 
     return trees
-
-
-# def get_syntax_trees(_path, with_file_names=False, with_file_content=False):
-#     """Get trees in path"""
-#     path = PATH
-#     file_names = get_file_names_from_path(path)
-    # for dir_name, dirs, files in os.walk(path, topdown=True):
-    #     for file in files:
-    #         if file.endswith('.py'):
-    #             file_names.append(os.path.join(dir_name, file))
-    #             if len(file_names) == 100:
-    #                 break
-    # logger.debug('total %s files' % len(file_names))
-
-    # for filename in file_names:
-    #     with open(filename, 'r', encoding='utf-8') as attempt_handler:
-    #         main_file_content = attempt_handler.read()
-    #     try:
-    #         tree = ast.parse(main_file_content)
-    #     except SyntaxError as e:
-    #         logger.warning(e)
-    #         tree = None
-    #
-    #     if with_file_names:
-    #         if with_file_content:
-    #             trees.append((filename, main_file_content, tree))
-    #         else:
-    #             trees.append((filename, tree))
-    #     else:
-    #         trees.append(tree)
-    # trees = get_syntax_trees_from_files(file_names)
-    # logger.debug('trees generated')
-    # return trees
 
 
 def get_all_names(tree):
@@ -104,19 +73,6 @@ def get_verbs_from_function_name(function_name):
     :return list with verbs
     """
     return [word for word in function_name.split('_') if is_verb(word)]
-
-
-# def get_all_words_in_path(path):
-#     """Get all words in path"""
-#     trees = [t for t in get_syntax_trees(path) if t]
-#     function_names = [f for f in make_list_flat([get_all_names(t) for t in trees])
-#                       if not (f.startswith('__') and f.endswith('__'))]
-
-    # def split_snake_case_name_to_words(name):
-    #     return [n for n in name.split('_') if n]
-    #
-    # return make_list_flat([split_snake_case_name_to_words(function_name)
-    #                        for function_name in function_names])
 
 
 def get_functions_from_tree(tree):
@@ -147,41 +103,6 @@ def get_verbs(function_name_list):
     return make_list_flat(verbs)
 
 
-# def get_top_verbs_in_path(path, top_size=10):
-#     """
-#     Получаем топ 10 глаголов в текущей дирректории
-#     :param path: Путь, строка
-#     :param top_size: Ограничение
-#     :return:
-#     """
-#     global PATH
-#     PATH = path
-#
-#     logger.debug(f'path is {path}')
-#
-#     trees = get_syntax_trees(None)
-#     all_functions = get_all_function_names(trees)
-#
-#     logger.debug(f'count of all function: {len(all_functions)}')
-#
-#     functions = get_function_names_without_special(all_functions)
-#
-#     logger.debug(f'count of function: {len(functions)}')
-#     logger.debug('functions extracted')
-#
-#     verbs = get_verbs(functions)
-#     return collections.Counter(verbs).most_common(top_size)
-
-
-# def get_top_functions_names_in_path(path, top_size=10):
-#     """Get top function name in path"""
-#     t = get_syntax_trees(path)
-#     nms = [f for f in make_list_flat(
-#         [[node.name.lower() for node in ast.walk(t) if isinstance(node, ast.FunctionDef)]
-#          for t in t]) if not (f.startswith('__') and f.endswith('__'))]
-#     return collections.Counter(nms).most_common(top_size)
-
-
 def check_download_dir():
     """
     The function checks the folder if the folder
@@ -210,7 +131,7 @@ def download_nltk_data():
     nltk.data.path.append(download_dir)
 
 
-def print_top_words(words, top_size):
+def print_top_words_in_console(words, top_size):
     """
     Prints top words in the console
     :param words: Word list
@@ -244,7 +165,7 @@ def main():
         verbs = get_verbs(function_names)
         words.append(verbs)
 
-    print_top_words(make_list_flat(words), TOP_SIZE)
+    print_top_words_in_console(make_list_flat(words), TOP_SIZE)
 
 
 if __name__ == '__main__':
