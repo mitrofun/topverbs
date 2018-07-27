@@ -103,3 +103,4 @@ node_modules
 /.cache/
 /TODO
 /.pytest_cache/
+/nltk_data/
