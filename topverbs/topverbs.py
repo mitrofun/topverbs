@@ -1,15 +1,15 @@
-import ast
 import os
-import collections
+import ast
 import nltk
+import argparse
+import collections
+
 import logging
 import logging.config
 
 from nltk import pos_tag
 
 DEBUG = os.environ.get('DEBUG') == 'true'
-
-TOP_SIZE = 10
 
 if DEBUG:
     logging.config.fileConfig('log.conf')
@@ -43,6 +43,11 @@ def get_file_names_from_path(path):
 
 
 def get_file_content(filename):
+    """
+    Get content from file
+    :param filename: name file, str
+    :return: content from file
+    """
     with open(filename, 'r', encoding='utf-8') as attempt_handler:
         main_file_content = attempt_handler.read()
     return main_file_content
@@ -131,6 +136,47 @@ def download_nltk_data():
     nltk.data.path.append(download_dir)
 
 
+def parse_args():
+    parser = argparse.ArgumentParser(
+        description='Top verbs used in function names in the project(s).'
+    )
+    parser.add_argument(
+        '-d',
+        '--dirs',
+        nargs='+',
+        dest='dirs',
+        required=True,
+        help='The path to the project or projects separated by space.'
+    )
+    parser.add_argument(
+        '-t',
+        '--top',
+        action='store',
+        default=10,
+        type=int,
+        dest='top_size',
+        help='The size of the top verbs, default is 10.',
+    )
+
+    return parser.parse_args()
+
+
+def get_raw_list_verbs(projects_dir):
+    words = []
+
+    download_nltk_data()
+
+    for path in projects_dir:
+        file_names = get_file_names_from_path(path)
+        syntax_trees = get_syntax_trees_from_files(file_names)
+        all_functions = get_all_function_names(syntax_trees)
+        function_names = get_function_names_without_special(all_functions)
+        verbs = get_verbs(function_names)
+        words.append(verbs)
+
+    return words
+
+
 def print_top_words_in_console(words, top_size):
     """
     Prints top words in the console
@@ -139,33 +185,19 @@ def print_top_words_in_console(words, top_size):
     :return: Print in console
     """
     print('-' * 120)
-    print(f'top {top_size} words')
+    print(f'top {top_size} verbs')
     print(f'total {len(words)} words, {len(set(words))} unique')
     for word, occurrence in collections.Counter(words).most_common(top_size):
         print(word, occurrence)
 
 
 def main():
-    words = []
-    projects = [
-        'Kindergartens',
-        'HJ-Site',
-        'onpoint',
-        'Google-Business-class'
-    ]
+    args = parse_args()
+    logger.debug(f'dirs {args.dirs}')
+    logger.debug(f'top {args.top_size}')
 
-    download_nltk_data()
-
-    for project in projects:
-        path = os.path.join('..', project)
-        file_names = get_file_names_from_path(path)
-        syntax_trees = get_syntax_trees_from_files(file_names)
-        all_functions = get_all_function_names(syntax_trees)
-        function_names = get_function_names_without_special(all_functions)
-        verbs = get_verbs(function_names)
-        words.append(verbs)
-
-    print_top_words_in_console(make_list_flat(words), TOP_SIZE)
+    words = get_raw_list_verbs(args.dirs)
+    print_top_words_in_console(make_list_flat(words), args.top_size)
 
 
 if __name__ == '__main__':
