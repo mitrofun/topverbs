@@ -1,7 +1,9 @@
 Upcoming
-- Run user command, if pkg install from pip
-- Not work function get_top_verbs, if pkg install from pip
-- Coverage code tests
+- run user command, if pkg install from pip
+- coverage code tests
+
+1.0.1
+- fix work in interpreter
 
 1.0
 - added smoke tests
