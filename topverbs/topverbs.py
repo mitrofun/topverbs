@@ -7,7 +7,9 @@ import logging.config
 
 from nltk import pos_tag
 
-Path = ''
+TOP_SIZE = 10
+
+PATH = ''
 
 logging.config.fileConfig('log.conf')
 # logging.basicConfig(level=logging.DEBUG)
@@ -62,7 +64,7 @@ def get_syntax_trees_from_files(file_names):
 
 def get_syntax_trees(_path, with_file_names=False, with_file_content=False):
     """Get trees in path"""
-    path = Path
+    path = PATH
     file_names = get_file_names_from_path(path)
     # for dir_name, dirs, files in os.walk(path, topdown=True):
     #     for file in files:
@@ -105,26 +107,45 @@ def get_verbs_from_function_name(function_name):
     return [word for word in function_name.split('_') if is_verb(word)]
 
 
-def get_all_words_in_path(path):
-    """Get all words in path"""
-    trees = [t for t in get_syntax_trees(path) if t]
-    function_names = [f for f in make_list_flat([get_all_names(t) for t in trees])
-                      if not (f.startswith('__') and f.endswith('__'))]
+# def get_all_words_in_path(path):
+#     """Get all words in path"""
+#     trees = [t for t in get_syntax_trees(path) if t]
+#     function_names = [f for f in make_list_flat([get_all_names(t) for t in trees])
+#                       if not (f.startswith('__') and f.endswith('__'))]
 
-    def split_snake_case_name_to_words(name):
-        return [n for n in name.split('_') if n]
-
-    return make_list_flat([split_snake_case_name_to_words(function_name)
-                           for function_name in function_names])
+    # def split_snake_case_name_to_words(name):
+    #     return [n for n in name.split('_') if n]
+    #
+    # return make_list_flat([split_snake_case_name_to_words(function_name)
+    #                        for function_name in function_names])
 
 
 def get_functions_from_tree(tree):
     return [node.name.lower() for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
 
 
-def get_function_names(trees):
+def get_all_function_names(trees):
     name_lists = [get_functions_from_tree(tree) for tree in trees]
     return make_list_flat(name_lists)
+
+
+def get_function_names_without_special(all_function_names):
+    """
+    Get a list of function names without special functions,
+    such as __init__, __add__ etc.
+    :param all_function_names: list with function names
+    :return: list with function names without special function name
+    """
+    functions = []
+    for function_name in all_function_names:
+        if not (function_name.startswith('__') and function_name.endswith('__')):
+            functions.append(function_name)
+    return functions
+
+
+def get_verbs(function_name_list):
+    verbs = [get_verbs_from_function_name(function_name) for function_name in function_name_list]
+    return make_list_flat(verbs)
 
 
 def get_top_verbs_in_path(path, top_size=10):
@@ -134,35 +155,32 @@ def get_top_verbs_in_path(path, top_size=10):
     :param top_size: Ограничение
     :return:
     """
-    global Path
-    Path = path
+    global PATH
+    PATH = path
 
     logger.debug(f'path is {path}')
 
     trees = get_syntax_trees(None)
-    functions = get_function_names(trees)
+    all_functions = get_all_function_names(trees)
 
-    logger.debug(functions)
+    logger.debug(f'count of all function: {len(all_functions)}')
+
+    functions = get_function_names_without_special(all_functions)
+
     logger.debug(f'count of function: {len(functions)}')
-
-    fncs = [f for f in functions if not (f.startswith('__') and f.endswith('__'))]
-
-    logger.debug(fncs)
-    logger.debug(f'count of function: {len(fncs)}')
     logger.debug('functions extracted')
 
-    verbs = make_list_flat([get_verbs_from_function_name(function_name) for function_name in fncs])
-
+    verbs = get_verbs(functions)
     return collections.Counter(verbs).most_common(top_size)
 
 
-def get_top_functions_names_in_path(path, top_size=10):
-    """Get top function name in path"""
-    t = get_syntax_trees(path)
-    nms = [f for f in make_list_flat(
-        [[node.name.lower() for node in ast.walk(t) if isinstance(node, ast.FunctionDef)]
-         for t in t]) if not (f.startswith('__') and f.endswith('__'))]
-    return collections.Counter(nms).most_common(top_size)
+# def get_top_functions_names_in_path(path, top_size=10):
+#     """Get top function name in path"""
+#     t = get_syntax_trees(path)
+#     nms = [f for f in make_list_flat(
+#         [[node.name.lower() for node in ast.walk(t) if isinstance(node, ast.FunctionDef)]
+#          for t in t]) if not (f.startswith('__') and f.endswith('__'))]
+#     return collections.Counter(nms).most_common(top_size)
 
 
 def check_download_dir():
@@ -205,17 +223,15 @@ def print_top_words(words, top_size):
     print(words)
     for word, occurrence in collections.Counter(words).most_common(top_size):
         print(word, occurrence)
-    print('-' * 120)
 
 
 def main():
-    TOP_SIZE = 10
     words = []
     projects = [
         'Kindergartens',
-        # 'HJ-Site',
-        # 'onpoint',
-        # 'Google-Business-class'
+        'HJ-Site',
+        'onpoint',
+        'Google-Business-class'
     ]
 
     download_nltk_data()
@@ -223,11 +239,6 @@ def main():
     for project in projects:
         path = os.path.join('..', project)
         words += get_top_verbs_in_path(path, top_size=TOP_SIZE)
-
-    # file_names = get_file_names_from_path(path)
-    # files_syntax_trees = get_syntax_trees_from_files(file_names)
-    # function_names = get_all_function_names(files_syntax_trees)
-    # verbs = get_all_verbs(function_names)
 
     print_top_words(words, TOP_SIZE)
 
