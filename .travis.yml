@@ -7,7 +7,8 @@ services:
 
 before_install:
 - docker build . -t topverbs
+- docker ps -a
 
 script:
-- bundle pytest
-- bundle make qa
+- docker run --rm topverbs make debug
+- docker run --rm topverbs make qa
