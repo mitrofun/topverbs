@@ -33,13 +33,35 @@ def get_file_names_from_path(path):
         for file in files:
             if file.endswith('.py'):
                 file_names.append(os.path.join(dir_name, file))
+                if len(file_names) == 100:
+                    break
     logger.debug('total %s files' % len(file_names))
     return file_names
 
 
+def get_file_content(filename):
+    with open(filename, 'r', encoding='utf-8') as attempt_handler:
+        main_file_content = attempt_handler.read()
+    return main_file_content
+
+
+def get_syntax_trees_from_files(file_names):
+    trees = []
+
+    for filename in file_names:
+        file_content = get_file_content(filename)
+        try:
+            tree = ast.parse(file_content)
+        except SyntaxError as e:
+            logger.warning(e)
+            continue
+        trees.append(tree)
+
+    return trees
+
+
 def get_syntax_trees(_path, with_file_names=False, with_file_content=False):
     """Get trees in path"""
-    trees = []
     path = Path
     file_names = get_file_names_from_path(path)
     # for dir_name, dirs, files in os.walk(path, topdown=True):
@@ -50,23 +72,23 @@ def get_syntax_trees(_path, with_file_names=False, with_file_content=False):
     #                 break
     # logger.debug('total %s files' % len(file_names))
 
-    for filename in file_names:
-
-        with open(filename, 'r', encoding='utf-8') as attempt_handler:
-            main_file_content = attempt_handler.read()
-        try:
-            tree = ast.parse(main_file_content)
-        except SyntaxError as e:
-            logger.warning(e)
-            tree = None
-        if with_file_names:
-            if with_file_content:
-                trees.append((filename, main_file_content, tree))
-            else:
-                trees.append((filename, tree))
-        else:
-            trees.append(tree)
-
+    # for filename in file_names:
+    #     with open(filename, 'r', encoding='utf-8') as attempt_handler:
+    #         main_file_content = attempt_handler.read()
+    #     try:
+    #         tree = ast.parse(main_file_content)
+    #     except SyntaxError as e:
+    #         logger.warning(e)
+    #         tree = None
+    #
+    #     if with_file_names:
+    #         if with_file_content:
+    #             trees.append((filename, main_file_content, tree))
+    #         else:
+    #             trees.append((filename, tree))
+    #     else:
+    #         trees.append(tree)
+    trees = get_syntax_trees_from_files(file_names)
     logger.debug('trees generated')
     return trees
 
@@ -96,6 +118,15 @@ def get_all_words_in_path(path):
                            for function_name in function_names])
 
 
+def get_functions_from_tree(tree):
+    return [node.name.lower() for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
+
+
+def get_function_names(trees):
+    name_lists = [get_functions_from_tree(tree) for tree in trees]
+    return make_list_flat(name_lists)
+
+
 def get_top_verbs_in_path(path, top_size=10):
     """
     Получаем топ 10 глаголов в текущей дирректории
@@ -103,17 +134,25 @@ def get_top_verbs_in_path(path, top_size=10):
     :param top_size: Ограничение
     :return:
     """
-    # global Path
-    # Path = path
+    global Path
+    Path = path
 
     logger.debug(f'path is {path}')
-    trees = [t for t in get_syntax_trees(None) if t]
-    fncs = [f for f in make_list_flat([[node.name.lower() for node in ast.walk(t)
-                                        if isinstance(node, ast.FunctionDef)] for t in trees])
-            if not (f.startswith('__') and f.endswith('__'))]
-    # TODO to logger
+
+    trees = get_syntax_trees(None)
+    functions = get_function_names(trees)
+
+    logger.debug(functions)
+    logger.debug(f'count of function: {len(functions)}')
+
+    fncs = [f for f in functions if not (f.startswith('__') and f.endswith('__'))]
+
+    logger.debug(fncs)
+    logger.debug(f'count of function: {len(fncs)}')
     logger.debug('functions extracted')
+
     verbs = make_list_flat([get_verbs_from_function_name(function_name) for function_name in fncs])
+
     return collections.Counter(verbs).most_common(top_size)
 
 
@@ -174,18 +213,18 @@ def main():
     words = []
     projects = [
         'Kindergartens',
-        'HJ-Site',
-        'onpoint',
-        'Google-Business-class'
+        # 'HJ-Site',
+        # 'onpoint',
+        # 'Google-Business-class'
     ]
 
     download_nltk_data()
 
     for project in projects:
-        path = os.path.join('../..', project)
+        path = os.path.join('..', project)
         words += get_top_verbs_in_path(path, top_size=TOP_SIZE)
 
-    # file_names = get_file_names(path)
+    # file_names = get_file_names_from_path(path)
     # files_syntax_trees = get_syntax_trees_from_files(file_names)
     # function_names = get_all_function_names(files_syntax_trees)
     # verbs = get_all_verbs(function_names)

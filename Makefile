@@ -1,4 +1,4 @@
-.PHONY: all help qa clean
+.PHONY: all help qa clean debug
 
 # target: all - Default target. Does nothing.
 all:
@@ -21,3 +21,7 @@ clean:
 	find . -name '*.pyc' -exec rm -f {} \;
 	find . -name '.DS_Store' -exec rm -f {} \;
 	find . -name "__pycache__" -type d -exec rm -rf {} +
+
+# target: debug - Run script in debug mode
+debug:
+	python topverbs/topverbs.py
