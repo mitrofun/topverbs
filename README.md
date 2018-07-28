@@ -26,9 +26,9 @@ print(words)
 '{"get": 69, "save": 5, "run": 3, "add": 2}'
 ```
 
-In console print:
+In console print command *topverbs*:
 ```bash
-python3 topverbs.py -d /Users/mitri4/Projects/Google-Business-class -t 10
+topverbs -d /Users/mitri4/Projects/Google-Business-class -t 10
 ============================== top 10 verbs ==============================
 total 475 words, 13 unique
 ==========================================================================
