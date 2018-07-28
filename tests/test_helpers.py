@@ -77,3 +77,7 @@ def test_get_functions_from_tree(file_with_code_path):
     functions = get_functions_from_tree(tree)
     assert len(functions) == 2
     assert 'say_hello' in functions
+
+
+def test_clean_special_function_names():
+    assert clean_special_function_names(['__add__', 'add']) == ['add']

@@ -5,7 +5,6 @@ COPY . /lib/topverbs
 RUN apk update && apk add --update --no-cache --progress \
     make \
     python3 \
-    git \
     ca-certificates \
     bash bash-completion \
     && update-ca-certificates 2>/dev/null || true \
