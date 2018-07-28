@@ -56,8 +56,6 @@ Contributors
 
 TODO
 =====
-- Run user command, if pkg install from pip
-- Not work function get_top_verbs, if pkg install from pip
 - Coverage code tests
 
 License
