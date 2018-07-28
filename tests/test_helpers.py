@@ -1,6 +1,4 @@
-# import mock
-
-from topverbs.topverbs import make_list_flat, is_verb, get_verbs_from_function_name, get_verbs
+from topverbs import make_list_flat, is_verb, get_verbs_from_function_name, get_verbs
 
 
 def test_make_list_flat():
@@ -8,10 +6,6 @@ def test_make_list_flat():
     assert make_list_flat([[1, 2, 3]]) == [1, 2, 3]
     assert make_list_flat([(1, 2), (3, 4)]) == [1, 2, 3, 4]
 
-
-# @mock.patch()
-# def test__check_download_dir():
-#     assert True
 
 def test_is_verb():
     """

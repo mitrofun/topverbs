@@ -1,6 +1,8 @@
 Upcoming
-- run user command, if pkg install from pip
 - coverage code tests
+
+1.0.2
+- add user command from shell
 
 1.0.1
 - fix work in interpreter
