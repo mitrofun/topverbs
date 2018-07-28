@@ -1,4 +1,4 @@
-.PHONY: all help qa clean debug coverage
+.PHONY: all help qa clean debug coverage coveralls
 
 # target: all - Default target. Does nothing.
 all:
@@ -29,3 +29,7 @@ debug:
 # target: coverage - Test coverage
 coverage:
 	py.test --cov=.
+
+# target: coveralls - Update info in coveralls.io (dev)
+coveralls:
+	coverage run --source=. setup.py pytest && COVERALLS_REPO_TOKEN=hO9WNNcZxAgWn9YPrLNrDoef0MrI9lU2x coveralls
