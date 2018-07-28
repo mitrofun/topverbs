@@ -98,12 +98,7 @@ def get_functions_from_tree(tree):
     return [node.name.lower() for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
 
 
-def get_all_function_names(trees):
-    name_lists = [get_functions_from_tree(tree) for tree in trees]
-    return make_list_flat(name_lists)
-
-
-def get_function_names_without_special(all_function_names):
+def clean_special_function_names(all_function_names):
     """
     Get a list of function names without special functions,
     such as __init__, __add__ etc.
@@ -117,6 +112,11 @@ def get_function_names_without_special(all_function_names):
     return functions
 
 
+def get_all_function_names(trees):
+    name_lists = [get_functions_from_tree(tree) for tree in trees]
+    return make_list_flat(name_lists)
+
+
 def get_verbs(function_name_list):
     verbs = [get_verbs_from_function_name(function_name) for function_name in function_name_list]
     return make_list_flat(verbs)
@@ -128,6 +128,9 @@ def download_nltk_data():
     :return: none
     """
     tagger = 'averaged_perceptron_tagger'
+    nltk_downloader = nltk.downloader.Downloader()
+    if nltk_downloader.status(tagger) == 'installed':
+        return
     nltk.download(tagger)
 
 
@@ -160,6 +163,34 @@ def parse_args():
     return parser.parse_args()
 
 
+def print_top_words_in_console(words, top_size):
+    """
+    Prints top words in the console
+    :param words: Word list
+    :param top_size: Size top, int
+    :return: Print in console
+    """
+    sys.stdout.write(Colors.BOLD)
+    print('=' * 30, f'top {top_size} verbs', '=' * 30)
+    print(f'total {len(words)} words, {len(set(words))} unique')
+    len_row = 30 * 2 + len(f'top {top_size} verbs') + 2
+    print('=' * len_row)
+    for word, occurrence in collections.Counter(words).most_common(top_size):
+        print(word, occurrence)
+    print('=' * len_row)
+    sys.stdout.write(Colors.ENDC)
+
+
+def words_to_json_dict(_list):
+    """
+    Make from list of tuples = > dict in json
+    :param _list:
+    :return: json, like {word: freq}
+    """
+    dictionary = dict((word, count) for word, count in _list)
+    return json.dumps(dictionary)
+
+
 def get_ungrouped_list_verbs(projects_dir):
     """
     Returns an ungrouped list of words
@@ -174,21 +205,11 @@ def get_ungrouped_list_verbs(projects_dir):
         file_names = get_file_names_from_path(path)
         syntax_trees = get_syntax_trees_from_files(file_names)
         all_functions = get_all_function_names(syntax_trees)
-        function_names = get_function_names_without_special(all_functions)
+        function_names = clean_special_function_names(all_functions)
         verbs = get_verbs(function_names)
         words.append(verbs)
 
     return words
-
-
-def words_to_json_dict(_list):
-    """
-    Make from list of tuples = > dict in json
-    :param _list:
-    :return: json, like {word: freq}
-    """
-    dictionary = dict((word, count) for word, count in _list)
-    return json.dumps(dictionary)
 
 
 def get_top_verbs(dirs, top_size=10, format_data='list'):
@@ -210,24 +231,6 @@ def get_top_verbs(dirs, top_size=10, format_data='list'):
     if format_data == 'json':
         data = words_to_json_dict(data)
     return data
-
-
-def print_top_words_in_console(words, top_size):
-    """
-    Prints top words in the console
-    :param words: Word list
-    :param top_size: Size top, int
-    :return: Print in console
-    """
-    sys.stdout.write(Colors.BOLD)
-    print('=' * 30, f'top {top_size} verbs', '=' * 30)
-    print(f'total {len(words)} words, {len(set(words))} unique')
-    len_row = 30 * 2 + len(f'top {top_size} verbs') + 2
-    print('=' * len_row)
-    for word, occurrence in collections.Counter(words).most_common(top_size):
-        print(word, occurrence)
-    print('=' * len_row)
-    sys.stdout.write(Colors.ENDC)
 
 
 def main():
