@@ -1,4 +1,7 @@
-from topverbs import make_list_flat, is_verb, get_verbs_from_function_name, get_verbs
+import os
+
+from topverbs import (make_list_flat, is_verb, get_verbs_from_function_name,
+                      get_verbs, get_top_verbs)
 
 
 def test_make_list_flat():
@@ -26,3 +29,11 @@ def test_get_verbs_from_function_name():
 def test_get_verbs():
     functions_name = ['save_data', 'get_list']
     assert get_verbs(functions_name) == ['save', 'get']
+
+
+def test_get_top_verbs():
+    root_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
+    fixtures = os.path.join(root_path, 'fixtures')
+    verbs = get_top_verbs(fixtures)
+    assert 'get' in make_list_flat(verbs)
+    assert 'say' in make_list_flat(verbs)

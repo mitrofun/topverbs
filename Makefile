@@ -1,4 +1,4 @@
-.PHONY: all help qa clean debug
+.PHONY: all help qa clean debug coverage
 
 # target: all - Default target. Does nothing.
 all:
@@ -25,3 +25,7 @@ clean:
 # target: debug - Run script in debug mode
 debug:
 	DEBUG=true python3 topverbs.py -d .
+
+# target: coverage - Test coverage
+coverage:
+	py.test --cov=.
