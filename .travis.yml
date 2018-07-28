@@ -16,4 +16,4 @@ script:
 
 after_success:
   - docker run --rm topverbs coverage run --source=. setup.py test
-  - docker run --rm topverbs make coverals
+  - docker run --rm topverbs make coveralls
