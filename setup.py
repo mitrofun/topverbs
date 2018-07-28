@@ -40,7 +40,7 @@ setup(
     author_email='mitri4@bk.ru',
     license='MIT',
     setup_requires=['pytest-runner'],
-    tests_require=['pytest'],
+    tests_require=['pytest', 'pytest-flake8', 'flake8'],
     test_suite='tests',
     zip_safe=False
 )

@@ -11,7 +11,7 @@ services:
   - docker
 
 install:
-  - pip install coveralls
+  - pip install coveralls pytest-flake8 flake8
 
 before_install:
   - docker build . -t topverbs
