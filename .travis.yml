@@ -4,9 +4,6 @@ language: python
 python:
   - 3.6
 
-install:
-  - pip install coveralls
-
 services:
   - docker
 
@@ -18,5 +15,5 @@ script:
   - docker run --rm topverbs make qa
 
 after_success:
-  - coverage run --source=mypkg setup.py test
-  - COVERALLS_REPO_TOKEN=aiHkQCR80g7rHVYDwYzuJad0tafh94uUw coveralls
+  - docker run --rm topverbs coverage run --source=. setup.py test
+  - docker run --rm topverbs make coverals
