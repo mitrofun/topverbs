@@ -1,17 +1,7 @@
 sudo: required
 
-language: python
-python:
-  - 3.6
-
-env:
-  - COVERALLS_REPO_TOKEN=aiHkQCR80g7rHVYDwYzuJad0tafh94uUw
-
 services:
   - docker
-
-install:
-  - pip install coveralls pytest-flake8 flake8
 
 before_install:
   - docker build . -t topverbs
@@ -19,6 +9,3 @@ before_install:
 script:
   - docker run --rm topverbs make debug
   - docker run --rm topverbs make qa
-
-after_success:
-  - coverage run --source=. setup.py test && coveralls
