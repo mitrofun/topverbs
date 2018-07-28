@@ -1,14 +1,19 @@
 sudo: required
 
 language: python
+python:
+  - 3.6
 
 services:
   - docker
 
 before_install:
-- docker build . -t topverbs
-- docker ps -a
+  - docker build . -t topverbs
 
 script:
-- docker run --rm topverbs make debug
-- docker run --rm topverbs make qa
+  - docker run --rm topverbs make debug
+  - docker run --rm topverbs make qa
+
+after_success:
+  - docker run --rm topverbs coverage run --source=. setup.py test
+  - docker run --rm topverbs make coveralls

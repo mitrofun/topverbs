@@ -194,9 +194,11 @@ def words_to_json_dict(_list):
 def get_ungrouped_list_verbs(projects_dir):
     """
     Returns an ungrouped list of words
-    :param projects_dir:
+    :param projects_dir: list
     :return: return list with ungrouped words(verbs)
     """
+    if type(projects_dir) != list:
+        raise TypeError('Send to function list of path projects.')
     words = []
 
     download_nltk_data()

@@ -1,7 +1,6 @@
-import os
+import pytest
 
-from topverbs import (make_list_flat, is_verb, get_verbs_from_function_name,
-                      get_verbs, get_top_verbs)
+from topverbs import *  # noqa
 
 
 def test_make_list_flat():
@@ -31,9 +30,50 @@ def test_get_verbs():
     assert get_verbs(functions_name) == ['save', 'get']
 
 
-def test_get_top_verbs():
-    root_path = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..'))
-    fixtures = os.path.join(root_path, 'fixtures')
-    verbs = get_top_verbs(fixtures)
+def test_get_top_verbs(fixtures_path):
+    verbs = get_top_verbs(fixtures_path)
     assert 'get' in make_list_flat(verbs)
     assert 'say' in make_list_flat(verbs)
+    assert len(verbs) == 2
+
+
+def test_get_top_verbs_json(fixtures_path):
+    verbs = get_top_verbs(fixtures_path, format_data='json')
+    assert 'get' in verbs
+    assert 'say' in verbs
+
+
+def test_get_top_verbs_top_count(fixtures_path):
+    verbs = get_top_verbs(fixtures_path, top_size=1)
+    assert len(verbs) == 1
+
+
+def test_get_ungrouped_list_verbs(fixtures_path):
+    verbs = get_ungrouped_list_verbs([fixtures_path])
+    assert len(verbs[0]) == 2
+    with pytest.raises(Exception):
+        get_ungrouped_list_verbs(fixtures_path)
+
+
+def test_get_file_names_from_path(fixtures_path):
+    list_files = get_file_names_from_path(fixtures_path)
+    file = os.path.basename(list_files[0])
+    assert file == 'hello.py'
+
+
+def test_get_syntax_trees_from_files(file_with_code_path):
+    """
+    Test for self, for understanding working ast module
+    """
+    tree = get_syntax_trees_from_files([file_with_code_path])
+    astNode = tree[0]
+    assert len(astNode.body) == 2
+    function_name = astNode.body[0].name
+    assert function_name == 'get_name'
+
+
+def test_get_functions_from_tree(file_with_code_path):
+    tree = get_syntax_trees_from_files([file_with_code_path])[0]
+    functions = get_functions_from_tree(tree)
+    assert len(functions) == 2
+    assert 'say_hello' in functions
