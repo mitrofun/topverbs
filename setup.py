@@ -3,8 +3,6 @@ import sys
 from setuptools import setup, find_packages
 from os.path import join, dirname
 
-print(sys.path)
-
 CURRENT_PYTHON = sys.version_info[:2]
 REQUIRED_PYTHON = (3, 6)
 
@@ -19,16 +17,15 @@ This version of topverbs requires Python {}.{}
 
 setup(
     name='topverbs',
-    scripts=['topverbs.py'],
     entry_points={'console_scripts': [
-        'topverbs = topverbs:main',
+        'topverbs = topverbs.topverbs:main',
     ]},
     version='1.1',
     install_requires=['nltk>=3'],
     packages=find_packages(),
     long_description=open(join(dirname(__file__), 'README.md')).read(),
     url='https://github.com/mitrofun/topverbs',
-    description='The funniest joke in the world',
+    description='Calculate the number of verbs used in function names in code.',
     classifiers=[
         'Development Status :: 1 - Alpha',
         'License :: OSI Approved :: MIT License',
@@ -40,7 +37,7 @@ setup(
     author_email='mitri4@bk.ru',
     license='MIT',
     setup_requires=['pytest-runner'],
-    tests_require=['pytest', 'pytest-flake8', 'flake8'],
+    tests_require=['pytest', 'pytest-flake8', 'flake8', 'mock'],
     test_suite='tests',
     zip_safe=False
 )

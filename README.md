@@ -54,9 +54,6 @@ Contributors
 =====
 - [mitri4](https://github.com/mitrofun)
 
-TODO
-=====
-- Coverage code tests
 
 License
 =====

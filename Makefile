@@ -1,4 +1,4 @@
-.PHONY: all help qa clean debug coverage coveralls
+.PHONY: all help qa clean debug coverage coveralls build setup-test
 
 # target: all - Default target. Does nothing.
 all:
@@ -24,7 +24,7 @@ clean:
 
 # target: debug - Run script in debug mode
 debug:
-	DEBUG=true python3 topverbs.py -d .
+	DEBUG=true python3 topverbs/topverbs.py -d .
 
 # target: coverage - Test coverage
 coverage:
@@ -32,4 +32,20 @@ coverage:
 
 # target: coveralls - Update info in coveralls.io (dev)
 coveralls:
-	coverage run --source=. setup.py pytest && COVERALLS_REPO_TOKEN=hO9WNNcZxAgWn9YPrLNrDoef0MrI9lU2x coveralls
+	coverage run --source=. setup.py test && COVERALLS_REPO_TOKEN=hO9WNNcZxAgWn9YPrLNrDoef0MrI9lU2x coveralls
+
+# target: build - Build pkg
+build:
+	python setup.py sdist
+
+# target: setup-test - Test setup py
+setup-test:
+	python setup.py test
+
+# target: docker-build - Build docker image with tag habrpars
+docker-build:
+	docker build . -t topverbs
+
+# target: docker-test - Test code in docker
+docker-test:
+	docker run --rm topverbs python3 setup.py test
