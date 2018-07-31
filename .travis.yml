@@ -7,7 +7,7 @@ services:
   - docker
 
 install:
-  - install git+https://github.com/mitrofun/topverbs
+  - pip install git+https://github.com/mitrofun/topverbs
 
 before_install:
   - docker build . -t topverbs
