@@ -1,5 +1,13 @@
+language: python
+
+python:
+  - "3.6"
+
 services:
   - docker
+
+install:
+  - install git+https://github.com/mitrofun/topverbs
 
 before_install:
   - docker build . -t topverbs
@@ -9,5 +17,7 @@ script:
   - docker run --rm topverbs make debug
   # test code with pytest
   - docker run --rm topverbs make qa
+  # test install to pip and run command from cli in docker
+  # - docker run --rm topverbs pip3 install git+https://github.com/mitrofun/topverbs && topverbs -d .
   # test install to pip and run command from cli
-  - docker run --rm topverbs pip3 install git+https://github.com/mitrofun/topverbs && topverbs -d .
+  - topverbs -d .
