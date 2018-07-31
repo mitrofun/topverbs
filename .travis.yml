@@ -1,5 +1,3 @@
-sudo: required
-
 services:
   - docker
 
@@ -7,5 +5,9 @@ before_install:
   - docker build . -t topverbs
 
 script:
+  # test run script in develop mode
   - docker run --rm topverbs make debug
+  # test code with pytest
   - docker run --rm topverbs make qa
+  # test install to pip and run command from cli
+  - docker run --rm topverbs pip3 install git+https://github.com/mitrofun/topverbs && topverbs -d .
