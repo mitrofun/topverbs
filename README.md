@@ -1,6 +1,6 @@
 Counting the frequency of using verbs in function names
 =====
-[![Build Status](https://travis-ci.org/mitrofun/topverbs.svg?branch=master)](https://travis-ci.org/mitrofun/topverbs) [![Coverage Status](https://coveralls.io/repos/github/mitrofun/topverbs/badge.svg?branch=master)](https://coveralls.io/github/mitrofun/topverbs?branch=master)
+[![Build Status](https://travis-ci.org/mitrofun/topverbs.svg?branch=master)](https://travis-ci.org/mitrofun/topverbs) [![Coverage Status](https://coveralls.io/repos/github/mitrofun/topverbs/badge.svg)](https://coveralls.io/github/mitrofun/topverbs)
 
 Script to count the number of verbs used in function names.
 
