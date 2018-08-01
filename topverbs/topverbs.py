@@ -1,39 +1,29 @@
-import sys
-
 import os
 import ast
 import nltk
-import json
 import argparse
 import collections
 
-import logging
 import logging.config
 
 from nltk import pos_tag
+
+from helpers import (
+    make_list_flat,
+    convert_list_of_tuples_to_json_dict,
+    get_file_names_from_path,
+    get_file_content
+)
+
+from console import print_top_words_in_console, print_debug_mode_header
 
 DEBUG = os.environ.get('DEBUG') == 'true'
 
 if DEBUG:
     logging.config.fileConfig('log.conf')
 
+
 logger = logging.getLogger(__name__)
-
-
-class Colors:
-    HEADER = '\033[95m'
-    BLUE = '\033[94m'
-    GREEN = '\033[92m'
-    RED = '\033[93m'
-    FAIL = '\033[91m'
-    ENDC = '\033[0m'
-    BOLD = '\033[1m'
-    UNDERLINE = '\033[4m'
-
-
-def make_list_flat(_list):
-    """ [(1,2), (3,4)] -> [1, 2, 3, 4]"""
-    return sum([list(item) for item in _list], [])
 
 
 def is_verb(word):
@@ -42,29 +32,6 @@ def is_verb(word):
         return False
     pos_info = pos_tag([word])
     return pos_info[0][1] == 'VB'
-
-
-def get_file_names_from_path(path):
-    file_names = []
-    for dir_name, dirs, files in os.walk(path, topdown=True):
-        for file in files:
-            if file.endswith('.py'):
-                file_names.append(os.path.join(dir_name, file))
-                if len(file_names) == 100:
-                    break
-    logger.debug('total %s files' % len(file_names))
-    return file_names
-
-
-def get_file_content(filename):
-    """
-    Get content from file
-    :param filename: name file, str
-    :return: content from file
-    """
-    with open(filename, 'r', encoding='utf-8') as attempt_handler:
-        main_file_content = attempt_handler.read()
-    return main_file_content
 
 
 def get_syntax_trees_from_files(file_names):
@@ -80,10 +47,6 @@ def get_syntax_trees_from_files(file_names):
         trees.append(tree)
 
     return trees
-
-
-def get_all_names(tree):
-    return [node.id for node in ast.walk(tree) if isinstance(node, ast.Name)]
 
 
 def get_verbs_from_function_name(function_name):
@@ -163,32 +126,25 @@ def parse_args():
     return parser.parse_args()
 
 
-def print_top_words_in_console(words, top_size):
+def get_top_verbs(dirs, top_size=10, format_data='list'):
     """
-    Prints top words in the console
-    :param words: Word list
-    :param top_size: Size top, int
-    :return: Print in console
+    Get top verbs used in function names in projects.
+    To get data in json format, specify format_data in the variable
+    :param format_data: output format,possible value :'json','list'.
+    Default is 'list'
+    :param dirs: path to project or list with path to project
+    :param top_size: top size
+    :return: list of tuples or json
     """
-    sys.stdout.write(Colors.BOLD)
-    print('=' * 30, f'top {top_size} verbs', '=' * 30)
-    print(f'total {len(words)} words, {len(set(words))} unique')
-    len_row = 30 * 2 + len(f'top {top_size} verbs') + 2
-    print('=' * len_row)
-    for word, occurrence in collections.Counter(words).most_common(top_size):
-        print(word, occurrence)
-    print('=' * len_row)
-    sys.stdout.write(Colors.ENDC)
-
-
-def words_to_json_dict(_list):
-    """
-    Make from list of tuples = > dict in json
-    :param _list:
-    :return: json, like {word: freq}
-    """
-    dictionary = dict((word, count) for word, count in _list)
-    return json.dumps(dictionary)
+    if not type(dirs) == list:
+        project_dirs = [dirs]
+    else:
+        project_dirs = dirs
+    words = get_ungrouped_list_verbs(project_dirs)
+    data = collections.Counter(make_list_flat(words)).most_common(top_size)
+    if format_data == 'json':
+        data = convert_list_of_tuples_to_json_dict(data)
+    return data
 
 
 def get_ungrouped_list_verbs(projects_dir):
@@ -214,32 +170,14 @@ def get_ungrouped_list_verbs(projects_dir):
     return words
 
 
-def get_top_verbs(dirs, top_size=10, format_data='list'):
-    """
-    Get top verbs used in function names in projects.
-    To get data in json format, specify format_data in the variable
-    :param format_data: output format,possible value :'json','list'.
-    Default is 'list'
-    :param dirs: path to project or list with path to project
-    :param top_size: top size
-    :return: list of tuples or json
-    """
-    if not type(dirs) == list:
-        project_dirs = [dirs]
-    else:
-        project_dirs = dirs
-    words = get_ungrouped_list_verbs(project_dirs)
-    data = collections.Counter(make_list_flat(words)).most_common(top_size)
-    if format_data == 'json':
-        data = words_to_json_dict(data)
-    return data
-
-
 def main():
     """
     Used to call from the command line
     :return: Print in console
     """
+    if DEBUG:
+        print_debug_mode_header()
+
     args = parse_args()
 
     words = get_ungrouped_list_verbs(args.dirs)

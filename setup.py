@@ -20,7 +20,7 @@ setup(
     entry_points={'console_scripts': [
         'topverbs = topverbs.topverbs:main',
     ]},
-    version='1.1',
+    version='1.1.1',
     install_requires=['nltk>=3'],
     packages=find_packages(),
     long_description=open(join(dirname(__file__), 'README.md')).read(),

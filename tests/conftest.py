@@ -3,7 +3,10 @@ import sys
 
 import pytest
 
-sys.path.insert(0, os.path.join(os.path.abspath('.'), 'topverbs'))
+ROOT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+sys.path.insert(0, ROOT_DIR)
+sys.path.insert(0, os.path.join(ROOT_DIR, 'topverbs'))
 
 
 @pytest.fixture

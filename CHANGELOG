@@ -1,5 +1,9 @@
 Upcoming
-- coverage code tests more
+- more fitch
+
+1.1.1
+- coverage code
+- refactor code, split code for modules
 
 1.1
 - update nltk data in it needed

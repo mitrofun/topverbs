@@ -1,14 +1,13 @@
+# import os
+from importlib import reload
 import argparse
 import pytest
 import mock
 
+from helpers import make_list_flat
+
+import topverbs
 from topverbs import *  # noqa
-
-
-def test_make_list_flat():
-    assert make_list_flat([(1, 2)]) == [1, 2]
-    assert make_list_flat([[1, 2, 3]]) == [1, 2, 3]
-    assert make_list_flat([(1, 2), (3, 4)]) == [1, 2, 3, 4]
 
 
 def test_is_verb():
@@ -19,6 +18,7 @@ def test_is_verb():
     assert is_verb('do') is True
     assert is_verb('save') is True
     assert is_verb('car') is False
+    assert is_verb('') is False
 
 
 def test_get_verbs_from_function_name():
@@ -32,8 +32,20 @@ def test_get_verbs():
     assert get_verbs(functions_name) == ['save', 'get']
 
 
+def test_get_all_names():
+    pass
+
+
 def test_get_top_verbs(fixtures_path):
     verbs = get_top_verbs(fixtures_path)
+    assert 'get' in make_list_flat(verbs)
+    assert 'say' in make_list_flat(verbs)
+    assert len(verbs) == 2
+
+
+def test_get_top_verbs_send_list_dir(fixtures_path):
+    list_dirs = [fixtures_path]
+    verbs = get_top_verbs(list_dirs)
     assert 'get' in make_list_flat(verbs)
     assert 'say' in make_list_flat(verbs)
     assert len(verbs) == 2
@@ -55,12 +67,6 @@ def test_get_ungrouped_list_verbs(fixtures_path):
     assert len(verbs[0]) == 2
     with pytest.raises(Exception):
         get_ungrouped_list_verbs(fixtures_path)
-
-
-def test_get_file_names_from_path(fixtures_path):
-    list_files = get_file_names_from_path(fixtures_path)
-    file = os.path.basename(list_files[0])
-    assert file == 'hello.py'
 
 
 def test_get_syntax_trees_from_files(file_with_code_path):
@@ -90,6 +96,16 @@ def test_clean_special_function_names():
 def test_main(args, capfd):
     main()
     out, err = capfd.readouterr()
-    print('\n')
-    print(out)
+    # print('\n')
+    # print(out)
     assert 'top 3 verbs' in out
+
+
+@mock.patch.dict(os.environ, {'DEBUG': 'true'})
+@mock.patch('argparse.ArgumentParser.parse_args',
+            return_value=argparse.Namespace(dirs=['.'], top_size=1))
+def test_debug_mode_active(args, capfd):
+    reload(topverbs)
+    main()
+    out, err = capfd.readouterr()
+    assert 'debug mode' in out
