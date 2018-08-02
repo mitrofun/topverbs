@@ -1,13 +1,10 @@
 import os
-import pytest
 
 from helpers import (
     make_list_flat,
     convert_list_of_tuples_to_json_dict,
     get_file_names_from_path,
-    get_file_content,
-    get_max_len_word,
-    get_max_len_number
+    get_file_content
 )
 
 
