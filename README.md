@@ -28,21 +28,18 @@ print(words)
 
 In console print command *topverbs*:
 ```bash
-topverbs -d /Users/mitri4/Projects/Google-Business-class -t 10
-============================== top 10 verbs ==============================
-total 475 words, 13 unique
-==========================================================================
-get 381
-see 29
-save 16
-add 16
-make 11
-be 7
-serialize 4
-sanitize 3
-have 3
-find 2
-==========================================================================
+topverbs -d ~/Projects/o-tech.io -t 7
+============================== top 7 verbs ==============================
+| total 2618 words, 45 unique                                           |
+=========================================================================
+| get : 1602                                                            |
+| add : 297                                                             |
+| run : 105                                                             |
+| find : 101                                                            |
+| make : 91                                                             |
+| save : 91                                                             |
+| remove : 64                                                           |
+=========================================================================
 ```
 
 Requirements
