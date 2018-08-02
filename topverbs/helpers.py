@@ -17,16 +17,6 @@ def convert_list_of_tuples_to_json_dict(_list):
     return json.dumps(dictionary)
 
 
-def get_max_len_word(_list):
-    """Return max len word from list"""
-    return max(len(item) for item in _list if type(item) != int)
-
-
-def get_max_len_number(_list):
-    """Return max number from list"""
-    return max(len(str(item)) for item in _list if type(item) == int)
-
-
 def get_file_names_from_path(path):
     file_names = []
     for dir_name, dirs, files in os.walk(path, topdown=True):

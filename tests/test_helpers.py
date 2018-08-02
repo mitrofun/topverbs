@@ -30,19 +30,3 @@ def test_get_file_names_from_path(fixtures_path):
 
 def test_get_file_content(file_with_code_path):
     assert 'say_hello' in get_file_content(file_with_code_path)
-
-
-@pytest.mark.parametrize('_list', [
-    ['тест', 1, 12, 'проверка'],
-    ['тест', 'проверка']
-])
-def test_get_max_len_word(_list):
-    assert get_max_len_word(_list) == 8
-
-
-@pytest.mark.parametrize('_list', [
-    ['тест', 1, 12, 'проверка'],
-    ['тест', 'проверка', 23, 46]
-])
-def test_get_max_len_number(_list):
-    assert get_max_len_number(_list) == 2

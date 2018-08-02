@@ -2,8 +2,6 @@ import sys
 
 import collections
 
-from helpers import get_max_len_word, get_max_len_number, make_list_flat
-
 
 class Colors:
     HEADER = '\033[95m'
@@ -16,6 +14,24 @@ class Colors:
     UNDERLINE = '\033[4m'
 
 
+def output_horizontal_bold_bolder(style, length_bolder):
+    sys.stdout.write(style)
+    print('=' * length_bolder)
+    sys.stdout.write(Colors.ENDC)
+
+
+def output_vertical_border(style, string_end='\n'):
+    sys.stdout.write(style)
+    print('|', end=string_end)
+    sys.stdout.write(Colors.ENDC)
+
+
+def output_header(style, wrapper, title):
+    sys.stdout.write(style)
+    print(wrapper, title, wrapper)
+    sys.stdout.write(Colors.ENDC)
+
+
 def print_top_words_in_console(words, top_size):
     """
     Prints top words in the console
@@ -23,26 +39,38 @@ def print_top_words_in_console(words, top_size):
     :param top_size: Size top, int
     :return: Print in console
     """
-    sys.stdout.write(Colors.BOLD + Colors.HEADER)
-    print('=' * 30, f'top {top_size} verbs', '=' * 30)
-    sys.stdout.write(Colors.ENDC)
-    sys.stdout.write(Colors.BOLD)
-    print(f'total {len(words)} words, {len(set(words))} unique')
-    len_row = 30 * 2 + len(f'top {top_size} verbs') + 2
-    print('=' * len_row)
+    # style for borders and header table
+    style_table = Colors.BOLD + Colors.GREEN
+    # set wrapper len, to change all output len
+    wrapper_len = 30
 
+    text_header = f'top {top_size} verbs'
+    text_header_wrapper = '=' * wrapper_len
+
+    len_all_row = len(text_header) + len(text_header_wrapper) * 2 + 2
+
+    output_header(style_table, text_header_wrapper, text_header)
+    # output content
+    sys.stdout.write(Colors.BOLD)
+    total_text = f'total {len(words)} words, {len(set(words))} unique'
+    output_vertical_border(style_table, string_end=' ')
+
+    sys.stdout.write(Colors.BOLD)
+    additional_spaces_len = len_all_row - len(total_text) - 4
+    print(total_text, ' ' * additional_spaces_len, end='')
+    output_vertical_border(style_table)
+    output_horizontal_bold_bolder(style_table, length_bolder=len_all_row)
     words_collection = collections.Counter(words).most_common(top_size)
-    flat_words_collection = make_list_flat(words_collection)
-    max_len_word = get_max_len_word(flat_words_collection)
-    max_len_number = get_max_len_number(flat_words_collection)
 
     for word, occurrence in words_collection:
-        str_len = len(f'{word} {occurrence}')
-        complete_len = (max_len_word + max_len_number + 2) - str_len
-        print(f'{word}: {occurrence}', ' ' * complete_len, '*' * occurrence)
-    sys.stdout.write(Colors.BOLD + Colors.HEADER)
-    print('=' * len_row)
-    sys.stdout.write(Colors.ENDC)
+        content_len = len(f'{word} : {occurrence}')
+        additional_spaces_len = len_all_row - content_len - 4
+        output_vertical_border(style_table, string_end=' ')
+        sys.stdout.write(Colors.BOLD)
+        print(f'{word} : {occurrence}', ' ' * additional_spaces_len, end='')
+        output_vertical_border(style_table)
+    # end table
+    output_horizontal_bold_bolder(style_table, length_bolder=len_all_row)
 
 
 def print_debug_mode_header():
