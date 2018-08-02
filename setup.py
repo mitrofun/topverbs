@@ -1,6 +1,10 @@
+import sys
+
 from setuptools import setup, find_packages
 from os.path import join, dirname
 
+if not sys.version_info[0] == 3 and sys.version_info[0] == 6:
+    sys.exit("Sorry, need Python >= 3.6")
 
 setup(
     name='topverbs',
@@ -26,5 +30,6 @@ setup(
     setup_requires=['pytest-runner'],
     tests_require=['pytest', 'pytest-flake8', 'flake8', 'mock'],
     test_suite='tests',
+    python_requires='>=3.6',
     zip_safe=False
 )
