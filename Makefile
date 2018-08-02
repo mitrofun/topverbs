@@ -32,7 +32,7 @@ coverage:
 
 # target: coveralls - Update info in coveralls.io (dev)
 coveralls:
-	coverage run --source=. setup.py test && COVERALLS_REPO_TOKEN=hO9WNNcZxAgWn9YPrLNrDoef0MrI9lU2x coveralls
+	coverage run --source=./topverbs setup.py test && COVERALLS_REPO_TOKEN=hO9WNNcZxAgWn9YPrLNrDoef0MrI9lU2x coveralls
 
 # target: build - Build pkg
 build:
