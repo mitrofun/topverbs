@@ -1,19 +1,6 @@
-import sys
-
 from setuptools import setup, find_packages
 from os.path import join, dirname
 
-CURRENT_PYTHON = sys.version_info[:2]
-REQUIRED_PYTHON = (3, 6)
-
-# This check and everything above must remain compatible with Python 2.7.
-if CURRENT_PYTHON < REQUIRED_PYTHON:
-    sys.stderr.write("""
-==========================
-Unsupported Python version
-==========================
-This version of topverbs requires Python {}.{}
-""")
 
 setup(
     name='topverbs',
