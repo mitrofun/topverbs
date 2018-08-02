@@ -1,6 +1,6 @@
 Counting the frequency of using verbs in function names
 =====
-[![Build Status](https://travis-ci.org/mitrofun/topverbs.svg?branch=master)](https://travis-ci.org/mitrofun/topverbs) [![Coverage Status](https://coveralls.io/repos/github/mitrofun/topverbs/badge.svg)](https://coveralls.io/github/mitrofun/topverbs) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mitrofun/topverbs/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mitrofun/topverbs/?branch=master) [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/mitrofun/topverbs/blob/master/LICENSE)
+[![Build Status](https://travis-ci.org/mitrofun/topverbs.svg?branch=master)](https://travis-ci.org/mitrofun/topverbs) [![Coverage Status](https://coveralls.io/repos/github/mitrofun/topverbs/badge.svg?branch=master)](https://coveralls.io/github/mitrofun/topverbs?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mitrofun/topverbs/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mitrofun/topverbs/?branch=master) [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/mitrofun/topverbs/blob/master/LICENSE)
 
 Script to count the number of verbs used in function names.
 
