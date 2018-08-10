@@ -16,6 +16,7 @@ from helpers import (
 )
 
 from console import print_top_words_in_console, colored_print
+from report import create_report_file
 from syntax import (
     get_syntax_trees_from_files, clean_special_names,
     get_all_function_names,
@@ -68,7 +69,8 @@ def get_code_elements_from_syntax_trees(syntax_trees, code_element='func'):
     return source_names
 
 
-def get_ungrouped_list_words(projects_dir, lang_category='verb', code_element='func'):
+def get_ungrouped_list_words(projects_dir, lang_category='verb', code_element='func',
+                             extension='py'):
     if type(projects_dir) != list:
         raise TypeError('Send to function list of path projects.')
     words = []
@@ -77,7 +79,7 @@ def get_ungrouped_list_words(projects_dir, lang_category='verb', code_element='f
     download_nltk_data()
 
     for path in projects_dir:
-        file_names = get_file_names_from_path(path)
+        file_names = get_file_names_from_path(path, ext=extension)
         syntax_trees = get_syntax_trees_from_files(file_names)
         source_names = get_code_elements_from_syntax_trees(syntax_trees, code_element)
         if lang_category == 'verb':
@@ -118,7 +120,8 @@ def parse_args():
         '-c',
         '--category',
         dest='lang_category',
-        help='Language word category. Possible value: noun, verb.',
+        help='Language word category. Possible value: noun - search noun in code, '
+             'verb - search verb in code.',
         default='verb',
         choices=['noun', 'verb']
     )
@@ -128,9 +131,41 @@ def parse_args():
         dest='code_element',
         help='The analyzed part of the code.'
              'Search for words in function names or local variables. '
-             'Possible value: var, func.',
+             'Possible value: var - search in local variables in function, '
+             'func - search in function names.',
         default='func',
         choices=['var', 'func']
+    )
+    parser.add_argument(
+        '-o',
+        '--output',
+        dest='output',
+        help='Report output method.Possible value: console - output result script to console, '
+             'file - output result script to file.',
+        default='console',
+        choices=['console', 'file']
+    )
+    parser.add_argument(
+        '--format',
+        dest='format_file',
+        help='Report output format.Possible value: json - save report in json format, '
+             'csv - save report in csv format.',
+        default='json',
+        choices=['json', 'csv']
+    )
+    parser.add_argument(
+        '--report',
+        dest='report_path',
+        help='Report path to file.Default is user home dir.',
+        default='~',
+        type=str
+    )
+    parser.add_argument(
+        '--ext',
+        dest='extension',
+        help='Analyze files with the file extension.Default is py.Is mode in develop.',
+        default='py',
+        type=str
     )
 
     return parser.parse_args()
@@ -143,15 +178,33 @@ def main():
     args = parse_args()
     dirs = args.dirs
 
+    if args.extension != 'py':
+        text = f'Is mode in develop. Analysis files with extension {args.extension} is not yet.'
+        colored_print(text, mode='warning')
+        return
+
     if args.repo:
         tmp_dir = tempfile.mkdtemp()
         clone_to_dir(args.repo, tmp_dir)
         dirs = [tmp_dir]
 
-    words = get_ungrouped_list_words(dirs, args.lang_category, args.code_element)
-    print_top_words_in_console(
-        make_list_flat(words), args.top_size, args.lang_category, args.code_element
-    )
+    words = get_ungrouped_list_words(dirs, args.lang_category, args.code_element, args.extension)
+    if args.output == 'file':
+        create_report_file(
+            make_list_flat(words),
+            args.top_size,
+            args.report_path,
+            args.lang_category,
+            args.code_element,
+            args.format_file
+        )
+    else:
+        print_top_words_in_console(
+            make_list_flat(words),
+            args.top_size,
+            args.lang_category,
+            args.code_element
+        )
 
     if args.repo:
         delete_created_repo_dir(dirs[0])

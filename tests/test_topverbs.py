@@ -61,8 +61,9 @@ def test_clean_special_names():
 @mock.patch('argparse.ArgumentParser.parse_args',
             return_value=argparse.Namespace(
                 dirs=['.'], top_size=3, repo='',
-                lang_category='verb', code_element='func')
-            )
+                lang_category='verb', code_element='func',
+                extension='py', output='console'
+            ))
 def test_main(args, capfd):
     main()
     out, err = capfd.readouterr()
@@ -74,8 +75,8 @@ def test_main(args, capfd):
             return_value=argparse.Namespace(
                 dirs=['.'], top_size=1, repo='',
                 lang_category='verb', code_element='func',
-            )
-            )
+                extension='py', output='console'
+            ))
 def test_debug_mode_active(args, capfd):
     reload(topverbs)
     main()

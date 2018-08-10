@@ -32,6 +32,17 @@ def output_header(style, wrapper, title):
     sys.stdout.write(Colors.ENDC)
 
 
+def colored_print(text, mode='info'):
+    color = Colors.BLUE
+
+    if mode == 'warning':
+        color = Colors.FAIL
+
+    sys.stdout.write(Colors.BOLD + color)
+    print(text)
+    sys.stdout.write(Colors.ENDC)
+
+
 def print_top_words_in_console(words, top_size, lang_category='verb', code_element='func'):
 
     # style for borders and header table
@@ -71,14 +82,3 @@ def print_top_words_in_console(words, top_size, lang_category='verb', code_eleme
         output_vertical_border(style_table)
     # end table
     output_horizontal_bold_bolder(style_table, length_bolder=len_all_row)
-
-
-def colored_print(text, mode='info'):
-    color = Colors.BLUE
-
-    if mode == 'warning':
-        color = Colors.FAIL
-
-    sys.stdout.write(Colors.BOLD + color)
-    print(text)
-    sys.stdout.write(Colors.ENDC)
