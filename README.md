@@ -10,20 +10,27 @@ Installation
 
 Usage
 =====
-In python code:
+In python code for find top 5 verb:
 ```python
 import topverbs
-words = topverbs.get_top_verbs('/Users/mitri4/Projects/ViewKids', top_size=5)
+words = topverbs.get_top_words('/Users/mitri4/Projects/ViewKids', top_size=5, lang_category='verb')
 print(words) 
 [('get', 69), ('save', 5), ('run', 3), ('add', 2)]
 ```
 
-In python code with json format:
+In python code with json format find top 5 verb:
 ```python
 import topverbs
-words = topverbs.get_top_verbs('/Users/mitri4/Projects/ViewKids', top_size=5, format_data='json')
+words = topverbs.get_top_words('/Users/mitri4/Projects/ViewKids', top_size=5, format_data='json', lang_category='verb')
 print(words) 
 '{"get": 69, "save": 5, "run": 3, "add": 2}'
+```
+In python code for find top 2 noun:
+```python
+import topverbs
+words = topverbs.get_top_words('/Users/mitri4/Projects/ViewKids', top_size=2, format_data='json', lang_category='verb')
+print(words) 
+'{"context": 18, "url": 12}'
 ```
 
 In console print command *topverbs*:
