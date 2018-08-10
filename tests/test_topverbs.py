@@ -6,34 +6,7 @@ import mock
 
 from helpers import make_list_flat
 
-import topverbs
 from topverbs import *  # noqa
-
-
-def test_is_verb():
-    """
-    Test for self, for understanding working function
-    the original project
-    """
-    assert is_verb('do') is True
-    assert is_verb('save') is True
-    assert is_verb('car') is False
-    assert is_verb('') is False
-
-
-def test_get_verbs_from_function_name():
-    assert get_verbs_from_function_name('save_data') == ['save']
-    assert get_verbs_from_function_name('get_list') == ['get']
-    assert get_verbs_from_function_name('get_and_save') == ['get', 'save']
-
-
-def test_get_verbs():
-    functions_name = ['save_data', 'get_list']
-    assert get_verbs(functions_name) == ['save', 'get']
-
-
-def test_get_all_names():
-    pass
 
 
 def test_get_top_verbs(fixtures_path):
