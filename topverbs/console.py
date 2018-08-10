@@ -32,19 +32,14 @@ def output_header(style, wrapper, title):
     sys.stdout.write(Colors.ENDC)
 
 
-def print_top_words_in_console(words, top_size):
-    """
-    Prints top words in the console
-    :param words: Word list
-    :param top_size: Size top, int
-    :return: Print in console
-    """
+def print_top_words_in_console(words, top_size, lang_category='verb'):
+
     # style for borders and header table
     style_table = Colors.BOLD + Colors.GREEN
     # set wrapper len, to change all output len
     wrapper_len = 30
 
-    text_header = f'top {top_size} verbs'
+    text_header = f'top {top_size} {lang_category}s'
     text_header_wrapper = '=' * wrapper_len
 
     len_all_row = len(text_header) + len(text_header_wrapper) * 2 + 2
@@ -73,7 +68,12 @@ def print_top_words_in_console(words, top_size):
     output_horizontal_bold_bolder(style_table, length_bolder=len_all_row)
 
 
-def print_debug_mode_header():
-    sys.stdout.write(Colors.BOLD + Colors.FAIL)
-    print('start script in debug mode')
+def colored_print(text, mode='info'):
+    color = Colors.BLUE
+
+    if mode == 'warning':
+        color = Colors.FAIL
+
+    sys.stdout.write(Colors.BOLD + color)
+    print(text)
     sys.stdout.write(Colors.ENDC)

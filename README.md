@@ -29,6 +29,7 @@ print(words)
 In console print command *topverbs*:
 ```bash
 topverbs -d ~/Projects/o-tech.io -t 7
+
 ============================== top 7 verbs ==============================
 | total 2618 words, 45 unique                                           |
 =========================================================================
@@ -40,6 +41,21 @@ topverbs -d ~/Projects/o-tech.io -t 7
 | save : 91                                                             |
 | remove : 64                                                           |
 =========================================================================
+```
+
+For analyze an external repository, run the --repo command with the url to the repository
+
+```bash
+topverbs --repo https://github.com/gitpython-developers/GitPython -t 2
+
+Repository cloned to path: /var/folders/zl/jwb5sj6n6bx_52tlh6kpdhjc0000gn/T/tmpwdnxg4k7/
+============================== top 2 verbs ==============================
+| total 82 words, 13 unique                                             |
+=========================================================================
+| get : 27                                                              |
+| add : 17                                                              |
+=========================================================================
+Remove temporary dir: /var/folders/zl/jwb5sj6n6bx_52tlh6kpdhjc0000gn/T/tmpwdnxg4k7
 ```
 
 Requirements

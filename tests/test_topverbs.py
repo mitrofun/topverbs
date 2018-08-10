@@ -37,7 +37,7 @@ def test_get_all_names():
 
 
 def test_get_top_verbs(fixtures_path):
-    verbs = get_top_verbs(fixtures_path)
+    verbs = get_top_words(fixtures_path)
     assert 'get' in make_list_flat(verbs)
     assert 'say' in make_list_flat(verbs)
     assert len(verbs) == 2
@@ -45,28 +45,28 @@ def test_get_top_verbs(fixtures_path):
 
 def test_get_top_verbs_send_list_dir(fixtures_path):
     list_dirs = [fixtures_path]
-    verbs = get_top_verbs(list_dirs)
+    verbs = get_top_words(list_dirs)
     assert 'get' in make_list_flat(verbs)
     assert 'say' in make_list_flat(verbs)
     assert len(verbs) == 2
 
 
 def test_get_top_verbs_json(fixtures_path):
-    verbs = get_top_verbs(fixtures_path, format_data='json')
+    verbs = get_top_words(fixtures_path, format_data='json')
     assert 'get' in verbs
     assert 'say' in verbs
 
 
 def test_get_top_verbs_top_count(fixtures_path):
-    verbs = get_top_verbs(fixtures_path, top_size=1)
+    verbs = get_top_words(fixtures_path, top_size=1)
     assert len(verbs) == 1
 
 
-def test_get_ungrouped_list_verbs(fixtures_path):
-    verbs = get_ungrouped_list_verbs([fixtures_path])
+def test_get_ungrouped_list_words(fixtures_path):
+    verbs = get_ungrouped_list_words([fixtures_path])
     assert len(verbs[0]) == 2
     with pytest.raises(Exception):
-        get_ungrouped_list_verbs(fixtures_path)
+        get_ungrouped_list_words(fixtures_path)
 
 
 def test_get_syntax_trees_from_files(file_with_code_path):
@@ -92,7 +92,7 @@ def test_clean_special_function_names():
 
 
 @mock.patch('argparse.ArgumentParser.parse_args',
-            return_value=argparse.Namespace(dirs=['.'], top_size=3))
+            return_value=argparse.Namespace(dirs=['.'], top_size=3, repo='', lang_category='verb'))
 def test_main(args, capfd):
     main()
     out, err = capfd.readouterr()
@@ -103,7 +103,7 @@ def test_main(args, capfd):
 
 @mock.patch.dict(os.environ, {'DEBUG': 'true'})
 @mock.patch('argparse.ArgumentParser.parse_args',
-            return_value=argparse.Namespace(dirs=['.'], top_size=1))
+            return_value=argparse.Namespace(dirs=['.'], top_size=1, repo='', lang_category='verb'))
 def test_debug_mode_active(args, capfd):
     reload(topverbs)
     main()

@@ -1,6 +1,11 @@
 Upcoming
 - more fitch
 
+1.2
+- add new params for script
+- check verbs and noon in code
+- save result to file
+
 1.1.1
 - coverage code
 - refactor code, split code for modules

@@ -5,6 +5,7 @@ import argparse
 import collections
 
 import logging.config
+import tempfile
 
 from nltk import pos_tag
 
@@ -15,7 +16,8 @@ from helpers import (
     get_file_content
 )
 
-from console import print_top_words_in_console, print_debug_mode_header
+from console import print_top_words_in_console, colored_print
+from os_handler import clone_to_dir, delete_created_repo_dir
 
 DEBUG = os.environ.get('DEBUG') == 'true'
 
@@ -27,11 +29,17 @@ logger = logging.getLogger(__name__)
 
 
 def is_verb(word):
-    """Check what word is verb"""
     if not word:
         return False
     pos_info = pos_tag([word])
     return pos_info[0][1] == 'VB'
+
+
+def is_noun(word):
+    if not word:
+        return False
+    pos_info = pos_tag([word])
+    return pos_info[0][1] == 'NN'
 
 
 def get_syntax_trees_from_files(file_names):
@@ -50,11 +58,11 @@ def get_syntax_trees_from_files(file_names):
 
 
 def get_verbs_from_function_name(function_name):
-    """
-    Get verbs from string
-    :return list with verbs
-    """
     return [word for word in function_name.split('_') if is_verb(word)]
+
+
+def get_nouns_from_function_name(function_name):
+    return [word for word in function_name.split('_') if is_noun(word)]
 
 
 def get_functions_from_tree(tree):
@@ -85,6 +93,11 @@ def get_verbs(function_name_list):
     return make_list_flat(verbs)
 
 
+def get_nouns(function_name_list):
+    nouns = [get_nouns_from_function_name(function_name) for function_name in function_name_list]
+    return make_list_flat(nouns)
+
+
 def download_nltk_data():
     """
     Upload the data for analysis to the download folder
@@ -95,6 +108,39 @@ def download_nltk_data():
     if nltk_downloader.status(tagger) == 'installed':
         return
     nltk.download(tagger)
+
+
+def get_top_words(dirs, top_size=10, format_data='list', lang_category='verb'):
+    if not type(dirs) == list:
+        project_dirs = [dirs]
+    else:
+        project_dirs = dirs
+    words = get_ungrouped_list_words(project_dirs, lang_category)
+    data = collections.Counter(make_list_flat(words)).most_common(top_size)
+    if format_data == 'json':
+        data = convert_list_of_tuples_to_json_dict(data)
+    return data
+
+
+def get_ungrouped_list_words(projects_dir, lang_category='verb'):
+    if type(projects_dir) != list:
+        raise TypeError('Send to function list of path projects.')
+    words = []
+    word_list = []
+
+    download_nltk_data()
+
+    for path in projects_dir:
+        file_names = get_file_names_from_path(path)
+        syntax_trees = get_syntax_trees_from_files(file_names)
+        all_functions = get_all_function_names(syntax_trees)
+        function_names = clean_special_function_names(all_functions)
+        if lang_category == 'verb':
+            word_list = get_verbs(function_names)
+        if lang_category == 'noun':
+            word_list = get_nouns(function_names)
+        words.append(word_list)
+    return words
 
 
 def parse_args():
@@ -110,7 +156,6 @@ def parse_args():
         '--dirs',
         nargs='+',
         dest='dirs',
-        required=True,
         help='The path to the project or projects separated by space.'
     )
     parser.add_argument(
@@ -122,66 +167,42 @@ def parse_args():
         dest='top_size',
         help='The size of the top verbs, default is 10.',
     )
+    parser.add_argument(
+        '--repo',
+        dest='repo',
+        help='The repository url.'
+    )
+
+    parser.add_argument(
+        '-c',
+        '--category',
+        dest='lang_category',
+        help='Language word category. Possible value: noun,verb',
+        default='verb',
+        choices=['noun', 'verb']
+    )
 
     return parser.parse_args()
 
 
-def get_top_verbs(dirs, top_size=10, format_data='list'):
-    """
-    Get top verbs used in function names in projects.
-    To get data in json format, specify format_data in the variable
-    :param format_data: output format,possible value :'json','list'.
-    Default is 'list'
-    :param dirs: path to project or list with path to project
-    :param top_size: top size
-    :return: list of tuples or json
-    """
-    if not type(dirs) == list:
-        project_dirs = [dirs]
-    else:
-        project_dirs = dirs
-    words = get_ungrouped_list_verbs(project_dirs)
-    data = collections.Counter(make_list_flat(words)).most_common(top_size)
-    if format_data == 'json':
-        data = convert_list_of_tuples_to_json_dict(data)
-    return data
-
-
-def get_ungrouped_list_verbs(projects_dir):
-    """
-    Returns an ungrouped list of words
-    :param projects_dir: list
-    :return: return list with ungrouped words(verbs)
-    """
-    if type(projects_dir) != list:
-        raise TypeError('Send to function list of path projects.')
-    words = []
-
-    download_nltk_data()
-
-    for path in projects_dir:
-        file_names = get_file_names_from_path(path)
-        syntax_trees = get_syntax_trees_from_files(file_names)
-        all_functions = get_all_function_names(syntax_trees)
-        function_names = clean_special_function_names(all_functions)
-        verbs = get_verbs(function_names)
-        words.append(verbs)
-
-    return words
-
-
 def main():
-    """
-    Used to call from the command line
-    :return: Print in console
-    """
+
     if DEBUG:
-        print_debug_mode_header()
+        colored_print('Start script in debug mode', mode='warning')
 
     args = parse_args()
+    dirs = args.dirs
 
-    words = get_ungrouped_list_verbs(args.dirs)
-    print_top_words_in_console(make_list_flat(words), args.top_size)
+    if args.repo:
+        tmp_dir = tempfile.mkdtemp()
+        clone_to_dir(args.repo, tmp_dir)
+        dirs = [tmp_dir]
+
+    words = get_ungrouped_list_words(dirs, args.lang_category)
+    print_top_words_in_console(make_list_flat(words), args.top_size, args.lang_category)
+
+    if args.repo:
+        delete_created_repo_dir(dirs[0])
 
 
 if __name__ == '__main__':
