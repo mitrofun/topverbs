@@ -6,6 +6,7 @@ import mock
 
 from helpers import make_list_flat
 
+import topverbs
 from topverbs import *  # noqa
 
 
@@ -51,13 +52,6 @@ def test_get_syntax_trees_from_files(file_with_code_path):
     assert len(astNode.body) == 2
     function_name = astNode.body[0].name
     assert function_name == 'get_name'
-
-
-def test_get_functions_from_tree(file_with_code_path):
-    tree = get_syntax_trees_from_files([file_with_code_path])[0]
-    functions = get_functions_from_tree(tree)
-    assert len(functions) == 2
-    assert 'say_hello' in functions
 
 
 def test_clean_special_names():
