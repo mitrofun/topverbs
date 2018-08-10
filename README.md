@@ -1,8 +1,8 @@
-Counting the frequency of using verbs in function names
+Topverbs
 =====
 [![Build Status](https://travis-ci.org/mitrofun/topverbs.svg?branch=master)](https://travis-ci.org/mitrofun/topverbs) [![Coverage Status](https://coveralls.io/repos/github/mitrofun/topverbs/badge.svg?branch=master)](https://coveralls.io/github/mitrofun/topverbs?branch=master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/mitrofun/topverbs/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/mitrofun/topverbs/?branch=master) [![GitHub license](https://img.shields.io/github/license/Naereen/StrapDown.js.svg)](https://github.com/mitrofun/topverbs/blob/master/LICENSE)
 
-Script to count the number of verbs used in function names.
+Counting the frequency of verbs and nouns in function names and local variables in the code.
 
 Installation
 =====
@@ -76,12 +76,12 @@ In console print command *topverbs*:
 ```bash
 topverbs -d ~/Projects/o-tech.io -t 7
 
-============================== top 7 verbs ==============================
-| total 2618 words, 45 unique                                           |
+======================== top 7 verbs in function ========================
+| total 2625 words, 45 unique                                           |
 =========================================================================
-| get : 1602                                                            |
+| get : 1604                                                            |
 | add : 297                                                             |
-| run : 105                                                             |
+| run : 109                                                             |
 | find : 101                                                            |
 | make : 91                                                             |
 | save : 91                                                             |
@@ -92,16 +92,19 @@ topverbs -d ~/Projects/o-tech.io -t 7
 For analyze an external repository, run the --repo command with the url to the repository
 
 ```bash
-topverbs --repo https://github.com/gitpython-developers/GitPython -t 2
+topverbs --repo https://github.com/gitpython-developers/GitPython -t 5 --category noun -e var
 
-Repository cloned to path: /var/folders/zl/jwb5sj6n6bx_52tlh6kpdhjc0000gn/T/tmpwdnxg4k7/
-============================== top 2 verbs ==============================
-| total 82 words, 13 unique                                             |
-=========================================================================
-| get : 27                                                              |
-| add : 17                                                              |
-=========================================================================
-Remove temporary dir: /var/folders/zl/jwb5sj6n6bx_52tlh6kpdhjc0000gn/T/tmpwdnxg4k7
+Repository cloned to path: /var/folders/zl/jwb5sj6n6bx_52tlh6kpdhjc0000gn/T/tmp4o5a11u6/
+======================== top 5 nouns in variables ========================
+| total 1403 words, 436 unique                                           |
+==========================================================================
+| path : 63                                                              |
+| commit : 48                                                            |
+| repo : 39                                                              |
+| index : 34                                                             |
+| file : 29                                                              |
+==========================================================================
+Remove temporary dir: /var/folders/zl/jwb5sj6n6bx_52tlh6kpdhjc0000gn/T/tmp4o5a11u6
 ```
 
 Requirements
