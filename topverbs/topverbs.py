@@ -24,7 +24,6 @@ DEBUG = os.environ.get('DEBUG') == 'true'
 if DEBUG:
     logging.config.fileConfig('log.conf')
 
-
 logger = logging.getLogger(__name__)
 
 
@@ -69,13 +68,14 @@ def get_functions_from_tree(tree):
     return [node.name.lower() for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
 
 
-def clean_special_function_names(all_function_names):
-    """
-    Get a list of function names without special functions,
-    such as __init__, __add__ etc.
-    :param all_function_names: list with function names
-    :return: list with function names without special function name
-    """
+def get_variables_names_from_tree(tree):
+    body_functions = \
+        [node.body for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
+    return make_list_flat([[a.targets[0].id for a in fb if isinstance(a, ast.Assign) and
+                            isinstance(a.targets[0], ast.Name)] for fb in body_functions])
+
+
+def clean_special_names(all_function_names):
     functions = []
     for function_name in all_function_names:
         if not (function_name.startswith('__') and function_name.endswith('__')):
@@ -85,6 +85,11 @@ def clean_special_function_names(all_function_names):
 
 def get_all_function_names(trees):
     name_lists = [get_functions_from_tree(tree) for tree in trees]
+    return make_list_flat(name_lists)
+
+
+def get_all_variables_names(trees):
+    name_lists = [get_variables_names_from_tree(tree) for tree in trees]
     return make_list_flat(name_lists)
 
 
@@ -122,7 +127,21 @@ def get_top_words(dirs, top_size=10, format_data='list', lang_category='verb'):
     return data
 
 
-def get_ungrouped_list_words(projects_dir, lang_category='verb'):
+def get_code_elements_from_syntax_trees(syntax_trees, code_element='func'):
+    all_source = []
+
+    if code_element == 'func':
+        all_source = get_all_function_names(syntax_trees)
+
+    if code_element == 'var':
+        all_source = get_all_variables_names(syntax_trees)
+
+    source_names = clean_special_names(all_source)
+
+    return source_names
+
+
+def get_ungrouped_list_words(projects_dir, lang_category='verb', code_element='func'):
     if type(projects_dir) != list:
         raise TypeError('Send to function list of path projects.')
     words = []
@@ -133,21 +152,17 @@ def get_ungrouped_list_words(projects_dir, lang_category='verb'):
     for path in projects_dir:
         file_names = get_file_names_from_path(path)
         syntax_trees = get_syntax_trees_from_files(file_names)
-        all_functions = get_all_function_names(syntax_trees)
-        function_names = clean_special_function_names(all_functions)
+        source_names = get_code_elements_from_syntax_trees(syntax_trees, code_element)
         if lang_category == 'verb':
-            word_list = get_verbs(function_names)
+            word_list = get_verbs(source_names)
         if lang_category == 'noun':
-            word_list = get_nouns(function_names)
+            word_list = get_nouns(source_names)
         words.append(word_list)
     return words
 
 
 def parse_args():
-    """
-    Get arguments from the command line
-    :return: args from console
-    """
+
     parser = argparse.ArgumentParser(
         description='Top verbs used in function names in the project(s).'
     )
@@ -172,21 +187,29 @@ def parse_args():
         dest='repo',
         help='The repository url.'
     )
-
     parser.add_argument(
         '-c',
         '--category',
         dest='lang_category',
-        help='Language word category. Possible value: noun,verb',
+        help='Language word category. Possible value: noun, verb.',
         default='verb',
         choices=['noun', 'verb']
+    )
+    parser.add_argument(
+        '-e',
+        '--element',
+        dest='code_element',
+        help='The analyzed part of the code.'
+             'Search for words in function names or local variables. '
+             'Possible value: var, func.',
+        default='func',
+        choices=['var', 'func']
     )
 
     return parser.parse_args()
 
 
 def main():
-
     if DEBUG:
         colored_print('Start script in debug mode', mode='warning')
 
@@ -198,8 +221,10 @@ def main():
         clone_to_dir(args.repo, tmp_dir)
         dirs = [tmp_dir]
 
-    words = get_ungrouped_list_words(dirs, args.lang_category)
-    print_top_words_in_console(make_list_flat(words), args.top_size, args.lang_category)
+    words = get_ungrouped_list_words(dirs, args.lang_category, args.code_element)
+    print_top_words_in_console(
+        make_list_flat(words), args.top_size, args.lang_category, args.code_element
+    )
 
     if args.repo:
         delete_created_repo_dir(dirs[0])

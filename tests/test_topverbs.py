@@ -87,23 +87,28 @@ def test_get_functions_from_tree(file_with_code_path):
     assert 'say_hello' in functions
 
 
-def test_clean_special_function_names():
-    assert clean_special_function_names(['__add__', 'add']) == ['add']
+def test_clean_special_names():
+    assert clean_special_names(['__add__', 'add']) == ['add']
 
 
 @mock.patch('argparse.ArgumentParser.parse_args',
-            return_value=argparse.Namespace(dirs=['.'], top_size=3, repo='', lang_category='verb'))
+            return_value=argparse.Namespace(
+                dirs=['.'], top_size=3, repo='',
+                lang_category='verb', code_element='func')
+            )
 def test_main(args, capfd):
     main()
     out, err = capfd.readouterr()
-    # print('\n')
-    # print(out)
     assert 'top 3 verbs' in out
 
 
 @mock.patch.dict(os.environ, {'DEBUG': 'true'})
 @mock.patch('argparse.ArgumentParser.parse_args',
-            return_value=argparse.Namespace(dirs=['.'], top_size=1, repo='', lang_category='verb'))
+            return_value=argparse.Namespace(
+                dirs=['.'], top_size=1, repo='',
+                lang_category='verb', code_element='func',
+            )
+            )
 def test_debug_mode_active(args, capfd):
     reload(topverbs)
     main()

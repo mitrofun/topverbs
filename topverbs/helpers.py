@@ -12,11 +12,11 @@ def convert_list_of_tuples_to_json_dict(_list):
     return json.dumps(dictionary)
 
 
-def get_file_names_from_path(path):
+def get_file_names_from_path(path, ext='py'):
     file_names = []
     for dir_name, dirs, files in os.walk(path, topdown=True):
         for file in files:
-            if file.endswith('.py'):
+            if file.endswith(f'.{ext}'):
                 file_names.append(os.path.join(dir_name, file))
     return file_names
 

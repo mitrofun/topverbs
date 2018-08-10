@@ -32,14 +32,19 @@ def output_header(style, wrapper, title):
     sys.stdout.write(Colors.ENDC)
 
 
-def print_top_words_in_console(words, top_size, lang_category='verb'):
+def print_top_words_in_console(words, top_size, lang_category='verb', code_element='func'):
 
     # style for borders and header table
     style_table = Colors.BOLD + Colors.GREEN
     # set wrapper len, to change all output len
-    wrapper_len = 30
+    wrapper_len = 24
 
-    text_header = f'top {top_size} {lang_category}s'
+    if code_element == 'func':
+        code = 'function'
+    else:
+        code = 'variables'
+
+    text_header = f'top {top_size} {lang_category}s in {code}'
     text_header_wrapper = '=' * wrapper_len
 
     len_all_row = len(text_header) + len(text_header_wrapper) * 2 + 2

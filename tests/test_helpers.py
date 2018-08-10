@@ -25,5 +25,11 @@ def test_get_file_names_from_path(fixtures_path):
     assert file == 'hello.py'
 
 
+def test_get_file_names_from_path_by_js_ext(fixtures_path):
+    list_files = get_file_names_from_path(fixtures_path, 'js')
+    file = os.path.basename(list_files[0])
+    assert file == 'hello.js'
+
+
 def test_get_file_content(file_with_code_path):
     assert 'say_hello' in get_file_content(file_with_code_path)
