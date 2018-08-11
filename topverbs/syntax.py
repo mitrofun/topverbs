@@ -58,11 +58,20 @@ def get_functions_from_tree(tree):
     return [node.name.lower() for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
 
 
+def get_variable_names_from_body(body):
+    _list = []
+    for node in body:
+        if isinstance(node, ast.Assign) and isinstance(node.targets[0], ast.Name):
+            _list.append(node.targets[0].id)
+    return _list
+
+
 def get_variables_names_from_tree(tree):
-    body_functions = \
-        [node.body for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
-    return make_list_flat([[a.targets[0].id for a in fb if isinstance(a, ast.Assign) and
-                            isinstance(a.targets[0], ast.Name)] for fb in body_functions])
+    variables_names = []
+    body_functions = [node.body for node in ast.walk(tree) if isinstance(node, ast.FunctionDef)]
+    for body in body_functions:
+        variables_names += get_variable_names_from_body(body)
+    return variables_names
 
 
 def clean_special_names(all_function_names):
